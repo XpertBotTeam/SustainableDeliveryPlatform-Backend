@@ -28,7 +28,6 @@ const CompanySchema = new mongoose.Schema({
     },
     phoneNumber:{
         type: Number,
-	    required:true
     },
     address: {
         city: String,
