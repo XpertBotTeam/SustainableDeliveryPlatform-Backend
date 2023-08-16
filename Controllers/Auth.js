@@ -57,6 +57,13 @@ module.exports.Login = async (req, res, next) => {
 module.exports.Signup = async (req, res, next) => {
   const { type,userName } = req.body;
 
+   //validation
+   const result = validationResult(req);
+   if (!result.isEmpty()) {
+     console.log(result.array());
+     return res.status(500).json({ message: result.array() });
+   }
+
   try {
     user =
     (await User.findOne({ userName })) ||
@@ -72,9 +79,11 @@ module.exports.Signup = async (req, res, next) => {
     } else if (type === "Company") {
       //signUp as Company
       signupUserOfType(Company, req, res, next);
-    } else {
+    } else if (type === "DeliveryGuy") {
       //signUp as deliveryGuy
       signupUserOfType(DeliveryGuy, req, res, next);
+    }else{
+      return res.status(401).json({ error: "Type is invalid" });
     }
   } catch (err) {
     //error has occurred while signing up
@@ -87,12 +96,6 @@ module.exports.Signup = async (req, res, next) => {
 async function signupUserOfType(Model, req, res, next) {
   const { userName, password, name } = req.body;
 
-  //validation
-  const result = validationResult(req);
-  if (!result.isEmpty()) {
-    console.log(result.array());
-    return res.status(500).json({ message: result.array() });
-  }else{
     try {
       // Hash the password
       const hashedPassword = await bcrypt.hash(password,12);
@@ -111,7 +114,6 @@ async function signupUserOfType(Model, req, res, next) {
       console.log(error)
       return res.status(500).json({ message: 'internal server error while creating user' });
     }
-  }
 
   
 }

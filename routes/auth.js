@@ -21,12 +21,12 @@ router.post(
       "Please enter a valid password using at least 8 characters, 1 Capital letter, 1 small leter, 1 symbol"
     )
       .trim()
-      .isLength({ min: 8 })
       .isLength({ min: 8 }) //at least 8 characters
       .matches(/[A-Z]/) // At least 1 capital letter
       .matches(/[a-z]/) // At least 1 small letter
       .matches(/[!@#$%^&*(),.?":{}|<>]/), // At least 1 symbol
     body("name", "Please enter a valid name").trim().not().isEmpty(),
+    body("type", "You forgot to assign a type").trim().not().isEmpty(),
   ],
   Signup
 );
