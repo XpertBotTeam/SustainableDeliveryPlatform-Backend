@@ -1,17 +1,32 @@
 //import jwt
-const JsonWebToken = require ('jsonwebtoken');
+const JsonWebToken = require('jsonwebtoken');
 
-module.exports = isAuth = (req,res,next) => {
-    const {jwt} = req.headers
+//import helper functions
+const SearchByUserType = require('../Utils/SearchByUserType');
+
+module.exports = isAuth = async (req, res, next) => {
+    const { jwt } = req.headers
 
     //user is not authenticated
-    if(!jwt){
-        console.log('User is not authoprized')
-        return res.status(401).json({error:'User not authorized'})
+    if (!jwt) {
+        console.log('User is not authorized')
+        return res.status(401).json({ error: 'User not authorized' })
     }
 
-    //extract user from jwt
-    const user = JsonWebToken.decode(jwt);
-    res.status(201).json(user);
+    try {
+        //extract user from jwt
+        const userJWT = JsonWebToken.decode(jwt);
+
+        //pass the userType and userId to extract the user
+        const user = await SearchByUserType(userJWT.userType, userJWT.user._id);
+        if (user) {
+            req.user = user;
+            req.userType = userJWT.userType
+            next();
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(401).json({ error: err });
+    }
 
 }

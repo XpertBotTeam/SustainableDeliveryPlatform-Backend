@@ -38,7 +38,7 @@ module.exports.Login = async (req, res, next) => {
       }
 
       let token = jwt.sign({ user, userType },"SuperSecret",{
-        expiresIn: "1hr",
+        expiresIn: "1h",
       });
       res.json({ jwt: token });
     } else {
