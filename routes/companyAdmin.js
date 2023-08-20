@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const {} = require('../Controllers/Company');
+const CompanyAdminController = require( 76890987987)
 
-router.post('/addProduct')
+//import middlewares
+const isAuth = require('../Middlewares/isAuth');
+
+router.post('/addProduct',isAuth,CompanyAdminController.addProduct)
 
 module.exports = router;
