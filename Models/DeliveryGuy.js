@@ -30,6 +30,7 @@ const DeliveryGuySchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    phoneNumber: String,
 })
 
 //exporting Delivery Guy Model

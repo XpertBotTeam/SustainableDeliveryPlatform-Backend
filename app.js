@@ -4,12 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-//var usersRouter = require('./routes/users');
-var shopRouter = require('./routes/shop');
-
-//define routes
+//define routers
+const indexRouter = require('./routes/index');
+const shopRouter = require('./routes/shop');
 const authRouter = require('./routes/auth');
+const companyAdmin = require('./routes/companyAdmin');
+const userAdmin = require('./routes/userAdmin');
+const admin = require('./routes/admin');
 
 var app = express();
 
@@ -26,6 +27,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 //defining endpoints for routers
 app.use('/auth',authRouter);
 app.use('/shop',shopRouter)
+app.use('/company',companyAdmin)
+app.use('/user',userAdmin)
+app.use('/admin',admin)
 
 app.use('/', indexRouter);
 

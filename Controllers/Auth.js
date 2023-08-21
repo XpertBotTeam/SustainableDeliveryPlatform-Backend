@@ -25,7 +25,7 @@ module.exports.Login = async (req, res, next) => {
       (await DeliveryGuy.findOne({ userName }));
 
     //check if user exists and comparing the login credentials
-    if (user && bcrypt.compare(Password, user.password)) {
+    if (user && await bcrypt.compare(Password, user.password)) {
       //user found
       //assign userType
       let userType = "";
