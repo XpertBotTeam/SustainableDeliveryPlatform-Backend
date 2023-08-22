@@ -8,6 +8,10 @@ const isAuth = require('../Middlewares/isAuth');
 
 //router.post('/addProduct',isAuth,CompanyAdminController.addProduct)
 
+//handle edit user route
 router.post('/editUser',isAuth,AdminController.editUserProfile)
+
+//handle delete user route
+router.delete('/deleteUser',isAuth,AdminController.deleteUser)
 
 module.exports = router;

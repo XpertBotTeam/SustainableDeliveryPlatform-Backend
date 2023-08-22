@@ -10,7 +10,7 @@ module.exports = isAuth = async (req, res, next) => {
     //user is not authenticated
     if (!jwt) {
         console.log('User is not authorized')
-        return res.status(401).json({ error: 'User not authorized' })
+        return res.status(401).json({ message: 'User not authorized' })
     }
 
     try {
@@ -26,7 +26,7 @@ module.exports = isAuth = async (req, res, next) => {
         }
     } catch (err) {
         console.log(err);
-        return res.status(401).json({ error: err });
+        return res.status(401).json({ message: 'error authenticating user' });
     }
 
 }

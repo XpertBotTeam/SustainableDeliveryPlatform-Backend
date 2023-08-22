@@ -44,12 +44,12 @@ module.exports.Login = async (req, res, next) => {
     } else {
       //username and password doesn't match
       console.log("authentication failed no user found");
-      res.status(401).json({ error: "Authentication Failed" });
+      res.status(401).json({ message: "Authentication Failed" });
     }
   } catch (err) {
     //error happened while searching the user
     console.log(err);
-    res.status(500).json({ error: "internal server error" });
+    res.status(500).json({ message: "internal server error" });
   }
 };
 
@@ -70,7 +70,7 @@ module.exports.Signup = async (req, res, next) => {
     (await Company.findOne({ userName })) ||
     (await DeliveryGuy.findOne({ userName }));
     if(user){
-      return res.status(401).json({ error: "user already found" });
+      return res.status(401).json({ message: "user already found" });
     }
 
     if (type === "User") {
@@ -83,12 +83,12 @@ module.exports.Signup = async (req, res, next) => {
       //signUp as deliveryGuy
       signupUserOfType(DeliveryGuy, req, res, next);
     }else{
-      return res.status(401).json({ error: "Type is invalid" });
+      return res.status(401).json({ message: "Type is invalid" });
     }
   } catch (err) {
     //error has occurred while signing up
     console.log(`error signup: ${err}`);
-    return res.status(500).json({ error: "internal server error while signing up" });
+    return res.status(500).json({ message: "internal server error while signing up" });
   }
 };
 
