@@ -40,6 +40,21 @@ const UserSchema = new mongoose.Schema({
     },
 })
 
+//add to cart
+UserSchema.methods.addToCart = async function (productId) {
+    console.log(productId)
+    const productIndex = this.cart.items.findIndex(item => item.productId.equals(productId));
+    if(productIndex !== -1){
+        this.cart.items[productIndex].quantity++;
+    }else{
+        this.cart.items.push({productId: productId,quantity:1});
+    }
+    return await this.save()
+}
+
 //exporting User Model
 const User = mongoose.model('User',UserSchema);
+
+
+
 module.exports = User;
