@@ -42,7 +42,6 @@ const UserSchema = new mongoose.Schema({
 
 //add to cart
 UserSchema.methods.addToCart = async function (productId) {
-    console.log(productId)
     const productIndex = this.cart.items.findIndex(item => item.productId.equals(productId));
     if(productIndex !== -1){
         this.cart.items[productIndex].quantity++;
@@ -51,6 +50,28 @@ UserSchema.methods.addToCart = async function (productId) {
     }
     return await this.save()
 }
+
+//remove from cart
+UserSchema.methods.removeFromCart = async function (productId) {
+    const productIndex = this.cart.items.findIndex(item => item.productId.equals(productId));
+    
+    if (productIndex === -1) {
+        //product not found in cart
+        throw new Error('Product not found in cart');
+    } else {
+        //product found so we decrease quantity
+        const cartItem = this.cart.items[productIndex];
+        cartItem.quantity--;
+
+        if (cartItem.quantity <= 0) {
+            //the product should be removed
+            this.cart.items.splice(productIndex, 1); // Remove item from cart
+        }
+    }
+    //saving
+    return await this.save();
+};
+
 
 //exporting User Model
 const User = mongoose.model('User',UserSchema);

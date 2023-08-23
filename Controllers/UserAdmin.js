@@ -35,3 +35,30 @@ module.exports.addToCart = async (req, res, next) => {
         return res.status(500).json * { message: 'Error adding to cart' }
     }
 }
+
+
+//handle remove from cart route
+module.exports.removeFromCart = async (req, res, next) => {
+    if (req.userType !== 'User') {
+        return res.status(401).json({ message: 'Could not remove from cart as unauthorized' });
+    }
+
+    //extract product id
+    const {productId} = req.params;
+
+    try {
+        const result = await req.user.removeFromCart(productId);
+        if (!result) {
+            //the product was not removed from cart
+            return res.status(401).json({ message: 'Could not remove from cart' })
+        }
+
+        //product removed succesfully
+        return res.status(200).json({ message: 'Product removed succesfully' });
+
+    } catch (err) {
+        //error handling
+        console.log(err);
+        return res.status(500).json ( { message: 'Error removeing from cart' } )
+    }
+}
