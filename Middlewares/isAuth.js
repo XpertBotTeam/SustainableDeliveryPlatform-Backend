@@ -5,7 +5,7 @@ const JsonWebToken = require('jsonwebtoken');
 const SearchByUserType = require('../Utils/SearchByUserType');
 
 module.exports = isAuth = async (req, res, next) => {
-    const { jwt } = req.headers
+    const jwt = req.headers.jwt || req.query.jwt
 
     //user is not authenticated
     if (!jwt) {
@@ -22,6 +22,7 @@ module.exports = isAuth = async (req, res, next) => {
         if (user) {
             req.user = user;
             req.userType = userJWT.userType
+            userJWT.tokenType? req.tokenType = userJWT.tokenType : req.tokenType = 'authToken'
             next();
         }
     } catch (err) {

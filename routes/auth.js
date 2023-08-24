@@ -5,10 +5,11 @@ const router = express.Router();
 const {body} = require('express-validator') 
 
 //import Controllers
-const { Login, Signup } = require("../Controllers/Auth");
+const authController = require("../Controllers/Auth");
+const isAuth = require("../Middlewares/isAuth");
 
 //login
-router.post("/login", Login);
+router.post("/login", authController.Login);
 
 //signup
 router.post(
@@ -28,7 +29,13 @@ router.post(
     body("name", "Please enter a valid name").trim().not().isEmpty(),
     body("type", "You forgot to assign a type").trim().not().isEmpty(),
   ],
-  Signup
+  authController.Signup
 );
+
+//handle sending verification email
+router.get('/verifyEmail',isAuth,authController.sendUserVerification)
+
+//verify user
+router.get('/verifyUser',isAuth,authController.verifyUser);
 
 module.exports = router;

@@ -9,6 +9,7 @@ const { validationResult } = require("express-validator");
 //import bcrypt and jwt for authorization
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { sendMail } = require("../Utils/Mailer");
 
 /*//forget Password
 module.exports.forgetPassword = async (req,res,next) => {
@@ -26,17 +27,6 @@ module.exports.Login = async (req, res, next) => {
   const userName = req.body.userName;
   const Password = req.body.password;
   let user = null;
-  try{
-      //trying to find user
-      user =
-        (await User.findOne({ userName })) ||
-        (await Company.findOne({ userName })) ||
-        (await DeliveryGuy.findOne({ userName }));
-      if(!user){
-        return res.status(401).json({message:'could not find user'})
-      }
-      sendMail
-  }
 
   try {
     //trying to find user
@@ -136,5 +126,60 @@ async function signupUserOfType(Model, req, res, next) {
       return res.status(500).json({ message: 'internal server error while creating user' });
     }
 }
+
+//send verification mail
+module.exports.sendUserVerification = async (req,res,next)=>{
+  if(req.user.verified === true){
+    return res.status(401).json({message:'user already verified'})
+  }
+  const token = jwt.sign({ user:req.user, userType:req.userType, tokenType:'verificationToken' },"SuperSecret",{
+    expiresIn: "5m",
+  });
+  const message = `
+    <h1><b>Please click the link to verify</b></h1>
+    <a href='http://localhost:3000/auth/verifyUser?jwt=${token}'>Verify User</a>
+    try{
+
+    }
+  `
+  try{
+    const mail = await sendMail(req.user.userName , 'User Verification' , 'User Verification',message);
+    if(!mail){
+      return res.status(401).json({message:'Could not send verification'})
+    }
+      return res.status(200).json({message:'please check out your email for verification'});
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({message:'error sending email'});
+  }
+  }
+
+  //verifying user
+  module.exports.verifyUser = async (req,res,next) => {
+    if(req.tokenType !== 'verificationToken'){
+      return res.status(401).json({message:'jwt token is invalid'})
+    }
+    if(req.user.verified){
+      return res.status(401).json({message:'user already verified'})
+    }
+    try{
+      //verifying user
+      req.user.verified = true;
+      const result = await req.user.save();
+  
+      if(!result){
+        //verification failed
+        return res.status(401).json({message:'could not verify user'});
+      }
+      // verification was  done succesfully
+      return res.status(200).json({message:'user verified succesfully'});
+    }
+    catch(err){
+      //error handling
+      console.log(err);
+      return res.status(500).json({message:'error verifying user'});
+    }
+  }
 
 

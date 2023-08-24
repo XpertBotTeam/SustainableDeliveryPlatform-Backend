@@ -23,10 +23,12 @@ module.exports = {
 
     try {
       console.log(JSON.stringify(mailOptions))
-      await transporter.sendMail(mailOptions);
+      const mail = await transporter.sendMail(mailOptions);
       console.log('Email sent successfully');
+     return  mail?true:false
     } catch (error) {
       console.error('Error sending email:', error);
+      return false
     }
   },
 };
