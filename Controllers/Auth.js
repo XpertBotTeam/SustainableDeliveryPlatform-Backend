@@ -10,12 +10,33 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+/*//forget Password
+module.exports.forgetPassword = async (req,res,next) => {
+  const {userName} = req.body;
+  if(!userName){
+    return res.status(401).json({message:'please send a valid mail'})
+  }
+  let user;
+  await
+}*/
+
 //handle Login Middleware
 module.exports.Login = async (req, res, next) => {
   //extract User Data
   const userName = req.body.userName;
   const Password = req.body.password;
   let user = null;
+  try{
+      //trying to find user
+      user =
+        (await User.findOne({ userName })) ||
+        (await Company.findOne({ userName })) ||
+        (await DeliveryGuy.findOne({ userName }));
+      if(!user){
+        return res.status(401).json({message:'could not find user'})
+      }
+      sendMail
+  }
 
   try {
     //trying to find user
@@ -114,6 +135,6 @@ async function signupUserOfType(Model, req, res, next) {
       console.log(error)
       return res.status(500).json({ message: 'internal server error while creating user' });
     }
-
-  
 }
+
+
