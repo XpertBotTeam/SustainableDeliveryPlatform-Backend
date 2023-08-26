@@ -12,7 +12,13 @@ const companyAdmin = require('./routes/companyAdmin');
 const userAdmin = require('./routes/userAdmin');
 const admin = require('./routes/admin');
 
+//import cors
+const cors = require('cors')
+
 var app = express();
+
+//set up cors
+app.use(cors());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -23,6 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 //defining endpoints for routers
 app.use('/auth',authRouter);

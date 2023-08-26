@@ -38,4 +38,19 @@ router.get('/verifyEmail',isAuth,authController.sendUserVerification)
 //verify user
 router.get('/verifyUser',isAuth,authController.verifyUser);
 
+//verify user
+router.get('/passEmail',authController.sendUserPass);
+
+//verify user
+router.post('/forgetPass',isAuth,[body(
+  "password",
+  "Please enter a valid password using at least 8 characters, 1 Capital letter, 1 small leter, 1 symbol"
+)
+  .trim()
+  .isLength({ min: 8 }) //at least 8 characters
+  .matches(/[A-Z]/) // At least 1 capital letter
+  .matches(/[a-z]/) // At least 1 small letter
+  .matches(/[!@#$%^&*(),.?":{}|<>]/), // At least 1 symbol
+],authController.changePass);
+
 module.exports = router;

@@ -182,4 +182,78 @@ module.exports.sendUserVerification = async (req,res,next)=>{
     }
   }
 
+  //send forget pass email
+module.exports.sendUserPass= async (req,res,next)=>{
+  const {userName} = req.body;
+  //finding user and type
+  let userType = null;
+
+  const user = await User.findOne({ userName });
+  if (user) {
+    userType = 'User';
+  } else {
+    const company = await Company.findOne({ userName });
+    if (company) {
+      userType = 'Company';
+    } else {
+      const deliveryGuy = await DeliveryGuy.findOne({ userName });
+      if (deliveryGuy) {
+        userType = 'DeliveryGuy';
+      }
+    }
+  }
+
+  if(!user){
+    //user not found
+    return res.status(401).json({message:'no user found'})
+  }
+  const token = jwt.sign({ user, userType, tokenType:'forgetPassToken' },"SuperSecret",{
+    expiresIn: "5m",
+  });
+  const message = `
+    <h1 className='text-[green]'><b>Please click the link to change pass</b></h1>
+    <a href='http://localhost:3000/auth/forgetPass?jwt=${token}'>Verify User</a>
+  `
+  try{
+    const mail = await sendMail(user.userName , 'forget pass' , 'forget Pass',message);
+    if(!mail){
+      //mail wasnt sent
+      return res.status(401).json({message:'Could not send verification'})
+    }
+    //mail sent
+      return res.status(200).json({message:'please check out your email for verification'});
+  }
+  catch(err){
+    //error handling
+    console.log(err);
+    res.status(500).json({message:'error sending email'});
+  }
+  }
+
+  //changing pass
+  module.exports.changePass = async (req,res,next) => {
+    if(req.tokenType !== 'forgetPassToken'){
+      return res.status(401).json({message:'jwt token is invalid'})
+    }
+    try{
+      //changing pass
+      const hashedPassword = await bcrypt.hash(req.body.password,12);
+      req.user.password = hashedPassword;
+      console.log(req.user)
+      const result = await req.user.save();
+  
+      if(!result){
+        //pass change failed
+        return res.status(401).json({message:'could not change pass'});
+      }
+      // pass was changed succesfully
+      return res.status(200).json({message:'pass changed succesfully'});
+    }
+    catch(err){
+      //error handling
+      console.log(err);
+      return res.status(500).json({message:'error changing pass'});
+    }
+  }
+
 
