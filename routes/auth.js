@@ -41,7 +41,7 @@ router.get('/verifyUser',isAuth,authController.verifyUser);
 //verify user
 router.get('/passEmail',authController.sendUserPass);
 
-//verify user
+//forget password
 router.post('/forgetPass',isAuth,[body(
   "password",
   "Please enter a valid password using at least 8 characters, 1 Capital letter, 1 small leter, 1 symbol"
@@ -52,5 +52,8 @@ router.post('/forgetPass',isAuth,[body(
   .matches(/[a-z]/) // At least 1 small letter
   .matches(/[!@#$%^&*(),.?":{}|<>]/), // At least 1 symbol
 ],authController.changePass);
+
+//place order
+router.get('/placeOrder',isAuth,authController.placeOrder);
 
 module.exports = router;
