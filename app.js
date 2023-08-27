@@ -10,6 +10,7 @@ const shopRouter = require('./routes/shop');
 const authRouter = require('./routes/auth');
 const companyAdmin = require('./routes/companyAdmin');
 const userAdmin = require('./routes/userAdmin');
+const deliveryAdmin = require('./routes/deliveryGuyAdmin');
 const admin = require('./routes/admin');
 
 //import cors
@@ -36,6 +37,7 @@ app.use('/auth',authRouter);
 app.use('/shop',shopRouter)
 app.use('/company',companyAdmin)
 app.use('/user',userAdmin)
+app.use('/deliveryGuy',deliveryAdmin)
 app.use('/admin',admin)
 
 app.use('/', indexRouter);

@@ -27,6 +27,11 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    deliveryGuyId : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'DeliveryGuy',
+        default : null
+    }
 });
 
 // Define the models

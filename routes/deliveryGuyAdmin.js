@@ -7,6 +7,12 @@ const DeliveryController = require('../Controllers/DeliveryGuyAdmin');
 //importing middlewares
 const isAuth = require('../Middlewares/isAuth');
 
-router.get('/Orders',isAuth,DeliveryController.getOrders)
+router.get('/AllOrders',isAuth,DeliveryController.getOrders);
+
+router.get('/MyOrders',isAuth,DeliveryController.getOrdersByDeliveryGuy);
+
+router.post('/AssignOrders/:orderId',isAuth,DeliveryController.assignOrder);
+
+
 
 module.exports = router;

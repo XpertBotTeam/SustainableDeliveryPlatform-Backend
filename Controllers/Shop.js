@@ -10,11 +10,7 @@ const html = '<p>This is a <b>test</b> email.</p>';
 
 //get all products
 module.exports.getProducts = async (req,res,next) => {
-// Using nodemailer
-mailer.sendMail(to, subject, text, html);
 
-// Using SendGrid
-mailer.sendGridMail(to, subject, text, html);
     //find all products
     const products = await Products.find();
     if(!products){
