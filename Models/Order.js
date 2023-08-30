@@ -31,6 +31,10 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'DeliveryGuy',
         default : null
+    },
+    status:{
+        type: String,
+        default:'pending'
     }
 });
 
