@@ -1,6 +1,7 @@
 //import utils method
 const Company = require('../Models/Company');
 const DeliveryGuy = require('../Models/DeliveryGuy');
+const Order = require('../Models/Order');
 const User = require('../Models/User');
 const  SearchByUserType = require('../Utils/SearchByUserType');
 
