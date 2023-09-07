@@ -1,5 +1,7 @@
-//import Product Model
+//import Models
 const Products = require('../Models/Product');
+const Companies = require('../Models/Company');
+//midleware
 const mailer = require('../Utils/Mailer');
 
 const to = 'itanim555@gmail.com';
@@ -8,9 +10,29 @@ const text = 'This is a test email.';
 const html = '<p>This is a <b>test</b> email.</p>';
 //import mon
 
+//get products grouped by companies
+module.exports.getCompaniesProducts = async (req,res,next) => {
+    try{
+        //getting companies and their products
+        const CompaniesProducts = await Companies.find({ products: { $exists: true, $ne: [] } }).select('id bannerImage products').populate('products.productId')
+
+        if(!CompaniesProducts){
+            //could not get companies associated with products
+            return res.status(401).json({message:'no companies extracted'})
+        }
+    
+        //return companies associated with products
+        return res.status(200).send({companies:CompaniesProducts})
+    }catch(err){
+        //error handling
+        console.log(err);
+        res.status(500).json({message:'error getting products'})
+    }
+}
+
 //get all products
 module.exports.getProducts = async (req,res,next) => {
-
+    
     //find all products
     const products = await Products.find();
     if(!products){

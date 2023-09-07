@@ -19,8 +19,12 @@ const CompanySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    products:[{productId:{type:mongoose.Schema.Types.ObjectId,ref:'Product'}}],
     profileImage: {
         type: String,
+    },
+    bannerImage:{
+        type:String
     },
     verified: {
         type: Boolean,
