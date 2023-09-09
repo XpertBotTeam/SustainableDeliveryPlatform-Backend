@@ -1,6 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
+//for google auth
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+const passport = require('passport');
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http:///auth/google"
+},
+function(accessToken, refreshToken, profile, cb) {
+  User.findOrCreate({ googleId: profile.id }, function (err, user) {
+    return cb(err, user);
+  });
+}
+));
+
 //importing express validator
 const {body} = require('express-validator') 
 
@@ -52,6 +68,9 @@ router.post('/forgetPass',isAuth,[body(
   .matches(/[a-z]/) // At least 1 small letter
   .matches(/[!@#$%^&*(),.?":{}|<>]/), // At least 1 symbol
 ],authController.changePass);
+
+//google login
+router.get('/google',authController.googleLogin);
 
 //place order
 router.get('/placeOrder',isAuth,authController.placeOrder);

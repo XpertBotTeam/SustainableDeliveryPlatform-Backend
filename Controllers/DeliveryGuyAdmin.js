@@ -35,16 +35,34 @@ module.exports.getOrdersByDeliveryGuy = async (req,res,next) => {
 
     try{
         //get status param
-        const {status} = req.query;
+        const {status,orderId} = req.query;
 
-        if(status && (status!=='Completed' && status!=='Current' && status!== 'Pending')){
+
+        if(status && (status!=='Delivered' && status!=='Delivering' && status!== 'Prepared' && status!== 'Preparing')){
             //status code is wrong
             return res.status(401).json({message:'status error'})
         }
 
         //get orders
         const id = req.user._id;
-        const orders = status? await Order.find({deliveryGuyId: id,status}) :  await Order.find({deliveryGuyId: id}) 
+        const query = {
+          deliveryGuyId: req.user._id,
+        };
+        
+        if (orderId) {
+          console.log(orderId)
+          //add orderId if any
+          query._id = orderId;
+        }
+
+        if(status){
+          //add status if any
+          console.log(status)
+          query.status=status;
+        }
+        console.log(JSON.stringify(query))
+        //find order/orders
+        const orders = await Order.find(query);
 
         if(!orders){
             //no orders found

@@ -1,10 +1,70 @@
-const stripe = require("stripe")("your_stripe_secret_key");
+const stripe = require("stripe")(process.env.STRIPE_KEY);
+
+
+//google auth
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+const passport = require('passport');
 
 //import Models
 const User = require("../Models/User");
 const Company = require("../Models/Company");
 const DeliveryGuy = require("../Models/DeliveryGuy");
 const Order = require('../Models/Order');
+
+//google auth
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/google"
+},
+function(accessToken, refreshToken, profile, cb) {
+  // Assuming each collection has a field `googleId` to match with Google ID
+  User.findOne({ userName: profile.emails[0].value }, function (err, user) {
+    if(err) return cb(err);
+
+    if(user) {
+      const token = jwt.sign(
+        { user, userType: 'User' },
+        "SuperSecret",
+        { expiresIn: "1h" }
+      );
+
+      return cb(null, { user, token });
+    } else {
+      DeliveryGuy.findOne({userName: profile.emails[0].value }, function (err, deliveryGuy) {
+        if(err) return cb(err);
+
+        if(deliveryGuy) {
+          const token = jwt.sign(
+            { user: deliveryGuy, userType: 'DeliveryGuy' },
+            "SuperSecret",
+            { expiresIn: "1h" }
+          );
+
+          return cb(null, { user: deliveryGuy, token });
+        } else {
+          Company.findOne({ userName: profile.emails[0].value }, function (err, company) {
+            if(err) return cb(err);
+
+            if(company) {
+              const token = jwt.sign(
+                { user: company, userType: 'Company' },
+                "SuperSecret",
+                { expiresIn: "1h" }
+              );
+
+              return cb(null, { user: company, token });
+            } else {
+              return cb(new Error('Please sign up first using your Google account credentials'));
+            }
+          });
+        }
+      });
+    }
+  });
+}
+));
+
 
 //validation results from validator
 const { validationResult } = require("express-validator");
@@ -44,16 +104,16 @@ module.exports.Login = async (req, res, next) => {
       let token = jwt.sign({ user, userType }, "SuperSecret", {
         expiresIn: "1h",
       });
-      res.json({ jwt: token });
+      return res.json({ jwt: token });
     } else {
       //username and password doesn't match
       console.log("authentication failed no user found");
-      res.status(401).json({ message: "Authentication Failed" });
+      return res.status(401).json({ message: "Authentication Failed" });
     }
   } catch (err) {
     //error happened while searching the user
     console.log(err);
-    res.status(500).json({ message: "internal server error" });
+     return res.status(500).json({ message: "internal server error" });
   }
 };
 
@@ -279,9 +339,9 @@ module.exports.placeOrder = async (req, res, next) => {
   }
 
   try {
-    //search usert and add the cart with the related products
+    //search user and add the cart with the related products
     const user = await User.findById(req.user._id).populate(
-      "cart.items.productId"
+      "cart.items.product"
     );
 
     if (!user.cart.items.length) {
@@ -323,3 +383,19 @@ module.exports.placeOrder = async (req, res, next) => {
     return res.status(500).json({ message: "error placing order" });
   }
 };
+
+//google auth
+module.exports.googleLogin = (req, res, next) => {
+  passport.authenticate('google', { 
+    scope: ['profile', 'email'], 
+    failureRedirect: '/' 
+  })(req, res, (cb) => {
+    const { user, token } = cb;
+    return res.json({ jwt: token, user });
+  });
+};
+
+
+
+
+

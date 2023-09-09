@@ -1,8 +1,12 @@
 var createError = require('http-errors');
 var express = require('express');
+const session = require('express-session');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+
+//google auth
+const passport = require('passport');
 
 //define routers
 const indexRouter = require('./routes/index');
@@ -17,6 +21,16 @@ const admin = require('./routes/admin');
 const cors = require('cors')
 
 var app = express();
+
+//google auth
+app.use(session({
+  secret: 'SECRETKEY',
+  resave: true,
+  saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 //set up cors
 app.use(cors());
