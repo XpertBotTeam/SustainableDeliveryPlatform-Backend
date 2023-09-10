@@ -19,10 +19,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
   },
   address: {
-    city: String,
-    state: String,
-    country: String,
-  },
+    longitude:String,
+    latitude:String
+ },
   verified: {
     type: Boolean,
     default: false,

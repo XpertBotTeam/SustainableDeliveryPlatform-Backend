@@ -1,9 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_KEY);
 
-
-//google auth
-var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
+
 
 //import Models
 const User = require("../Models/User");
@@ -11,59 +9,6 @@ const Company = require("../Models/Company");
 const DeliveryGuy = require("../Models/DeliveryGuy");
 const Order = require('../Models/Order');
 
-//google auth
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google"
-},
-function(accessToken, refreshToken, profile, cb) {
-  // Assuming each collection has a field `googleId` to match with Google ID
-  User.findOne({ userName: profile.emails[0].value }, function (err, user) {
-    if(err) return cb(err);
-
-    if(user) {
-      const token = jwt.sign(
-        { user, userType: 'User' },
-        "SuperSecret",
-        { expiresIn: "1h" }
-      );
-
-      return cb(null, { user, token });
-    } else {
-      DeliveryGuy.findOne({userName: profile.emails[0].value }, function (err, deliveryGuy) {
-        if(err) return cb(err);
-
-        if(deliveryGuy) {
-          const token = jwt.sign(
-            { user: deliveryGuy, userType: 'DeliveryGuy' },
-            "SuperSecret",
-            { expiresIn: "1h" }
-          );
-
-          return cb(null, { user: deliveryGuy, token });
-        } else {
-          Company.findOne({ userName: profile.emails[0].value }, function (err, company) {
-            if(err) return cb(err);
-
-            if(company) {
-              const token = jwt.sign(
-                { user: company, userType: 'Company' },
-                "SuperSecret",
-                { expiresIn: "1h" }
-              );
-
-              return cb(null, { user: company, token });
-            } else {
-              return cb(new Error('Please sign up first using your Google account credentials'));
-            }
-          });
-        }
-      });
-    }
-  });
-}
-));
 
 
 //validation results from validator
@@ -385,17 +330,23 @@ module.exports.placeOrder = async (req, res, next) => {
 };
 
 //google auth
-module.exports.googleLogin = (req, res, next) => {
-  passport.authenticate('google', { 
-    scope: ['profile', 'email'], 
-    failureRedirect: '/' 
-  })(req, res, (cb) => {
-    const { user, token } = cb;
+module.exports.googleLogin =   passport.authenticate('google', {
+  scope: ['profile', 'email'],
+  failureRedirect: '/'
+});
+
+
+module.exports.googleCallback = (req, res, next) => {
+  passport.authenticate('google', (err, user) => {
+    if (err) { return next(err); }
+    if (!user) { return res.redirect('/login'); }
+
+    const token = jwt.sign(
+      { user, userType: 'User' },
+      "SuperSecret",
+      { expiresIn: "1h" }
+    );
+
     return res.json({ jwt: token, user });
-  });
+  })(req, res, next);
 };
-
-
-
-
-

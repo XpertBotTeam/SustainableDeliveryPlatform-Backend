@@ -12,4 +12,10 @@ router.post('/addToCart',isAuth,UserAdminController.addToCart)
 //remove from cart route
 router.post('/removeFromCart',isAuth,UserAdminController.removeFromCart)
 
+//get orders
+router.get('/myOrders',isAuth,UserAdminController.getOrders)
+
+//track order
+router.post('/trackOrder/:orderId',isAuth,UserAdminController.trackOrder)
+
 module.exports = router;

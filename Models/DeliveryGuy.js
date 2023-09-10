@@ -22,9 +22,8 @@ const DeliveryGuySchema = new mongoose.Schema({
         default: false,
     },
     address: {
-        city: String,
-        state: String,
-        country: String,
+       longitude:String,
+       latitude:String
     },
     isAvailable: {
         type: Boolean,

@@ -34,10 +34,9 @@ const CompanySchema = new mongoose.Schema({
         type: Number,
     },
     address: {
-        city: String,
-        state: String,
-        country: String,
-    }
+        longitude:String,
+        latitude:String
+     },
 })
 
 //exporting User Model

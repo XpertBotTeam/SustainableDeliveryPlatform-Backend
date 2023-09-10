@@ -1,6 +1,7 @@
 //import Models
 const User = require("../Models/User");
 const Product = require("../Models/Product")
+const Order = require('../Models/Order');
 
 //importing mongoose
 const mongoose = require('mongoose');
@@ -72,3 +73,64 @@ module.exports.removeFromCart = async (req, res, next) => {
         return res.status(500).json ( { message: 'Error removeing from cart' } )
     }
 }
+
+//get user orders
+module.exports.getOrders = async (req,res,next) => {
+ if(req.userType !== 'User'){
+    //not authorized
+    return res.status(401).json({message:'unauthorized user'});
+ }
+
+ console.log(req.user._id)
+ try{
+    //getting orders
+ const orders = await Order.find({userId: req.user._id});
+
+ if(orders.length === 0 || orders === null){
+        //no orders found
+        return res.status(401).json({message:'no orders found'});
+ }
+
+ //return orders
+ return res.status(200).json({orders});
+
+}catch(err){
+    //error handling
+    console.log(err);
+    return res.status(500).json({message:'error gettimg orders'})
+}
+}
+
+module.exports.trackOrder = async (req,res,next) => {
+    if(req.userType !== 'User'){
+        //not authorized
+        return res.status(401).json({message:'unauthorized user'});
+     }
+
+     //extract order details
+     const {orderId} =req.params;
+
+     //orderId not defined
+     if(!orderId){
+        return res.status(410).json({message:'orderId is not defined'})
+     }
+
+     try{
+
+    
+     const order = await Order.findById(orderId).populate('deliveryGuyId')
+
+     if(!order || order.length === 0) {
+        //no order found
+        return res.status(401).json({message:'error'})
+     }
+
+     //succesful
+     return res.status(200).json({address: order.deliveryGuyId.address})
+
+    }catch(err){
+        //error handling
+        console.log(err);
+        return res.status(500).json({message:'error tracking order'});
+    }
+    }
