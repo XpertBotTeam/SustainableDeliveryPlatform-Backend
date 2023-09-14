@@ -49,7 +49,7 @@ module.exports.Login = async (req, res, next) => {
       let token = jwt.sign({ user, userType }, "SuperSecret", {
         expiresIn: "1h",
       });
-      return res.json({ jwt: token });
+      return res.status(200).json({ jwt: token });
     } else {
       //username and password doesn't match
       console.log("authentication failed no user found");
