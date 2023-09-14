@@ -70,7 +70,7 @@ module.exports.Signup = async (req, res, next) => {
   const result = validationResult(req);
   if (!result.isEmpty()) {
     console.log(result.array());
-    return res.status(500).json({ message: result.array() });
+    return res.status(401).json({ message: result.array() });
   }
 
   try {
