@@ -7,7 +7,7 @@ const  SearchByUserType = require('../Utils/SearchByUserType');
 
 //update User Profile
 module.exports.editUserProfile = async (req, res, next) => {
-  const { name, profileImage, phoneNumber, city, state, country } = req.body;
+  const { name, profileImage, phoneNumber, longitude, latitude } = req.body;
   console.log(req.userType);
 
   try {
@@ -22,8 +22,8 @@ module.exports.editUserProfile = async (req, res, next) => {
     name ? (user.name = name) : "";
     profileImage ? (user.profileImage = profileImage) : "";
     phoneNumber ? (user.phoneNumber = phoneNumber) : "";
-    city ? (user.address.city = city) : "";
-    state ? (user.address.state = state) : "";
+    longitude ? (user.address.longitude = longitude) : "";
+    latitude ? (user.address.latitude = latitude) : "";
     country ? (user.address.country = country) : "";
 
     //save data
@@ -72,4 +72,29 @@ module.exports.deleteUser = async (req,res,next) => {
   }
   
   
+}
+
+//upload profile picture
+module.exports.UpdateProfilePicture = async (req,res,next) => {
+  //extracting uploaded image path
+  const imagePath = req.file.path;
+
+  try{
+    //changing profile pic
+    user.profileImage = imagePath;
+    const result = await user.save();
+
+    if(!result){
+      //image not saved
+      return res.status(401).json({message:'image was not saved'})
+    }
+
+    //image uploaded succesfully
+    return res.status(200).json({message:'Succesfully uploaded image'});
+     
+  }catch(err){
+    //error handling
+    console.log(err);
+    return res.status(500).json({message:'Could not upload image'})
+  }
 }

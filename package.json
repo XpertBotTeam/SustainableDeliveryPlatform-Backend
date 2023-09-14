@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "startServer":"C:\\Users\\user\\Downloads\\ngrok.exe http 3000",
+    "startServer": "C:\\Users\\user\\Downloads\\ngrok.exe http 3000",
     "build": "webpack --config webpack.config.js"
   },
   "dependencies": {
@@ -22,12 +22,14 @@
     "jade": "~1.11.0",
     "jsonwebtoken": "^9.0.1",
     "mongodb": "^5.7.0",
-    "mongoose": "^7.4.3",
+    "mongoose": "^7.5.1",
     "morgan": "~1.9.1",
+    "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.4",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "stripe": "^13.3.0",
+    "uuid": "^9.0.1",
     "webpack": "^5.88.2"
   },
   "devDependencies": {
