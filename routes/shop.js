@@ -7,6 +7,8 @@ const isAuth = require('../Middlewares/isAuth');
 //import shop controller
 const shopController = require('../Controllers/Shop');
 
+//get company details associated with products
+router.get('/getCompanyProducts/:companyId',shopController.getCompaniesProducts)
 
 //get companies associated with products
 router.get('/getCompanyProducts',shopController.getCompaniesProducts)
@@ -15,7 +17,7 @@ router.get('/getCompanyProducts',shopController.getCompaniesProducts)
 router.get('/getProducts',shopController.getProducts);
 
 //get products by companyId for users
-router.get('/getProductsByCompany/:companyid',shopController.getProductsByCompanyId);
+router.get('/getProductsByCompany/:companyId',shopController.getProductsByCompanyId);
 
 //get products by companyId for companies (for edit later)
 router.get('/getProductsByCompany',isAuth,shopController.getProductsByCompanyId);

@@ -13,8 +13,11 @@ const html = '<p>This is a <b>test</b> email.</p>';
 //get products grouped by companies
 module.exports.getCompaniesProducts = async (req,res,next) => {
     try{
+        //get companyId
+        const {companyId} = req.params;
+
         //getting companies and their products
-        const CompaniesProducts = await Companies.find({ products: { $exists: true, $ne: [] } }).select('id bannerImage products').populate('products.productId')
+        const CompaniesProducts = companyId? await Companies.find({_id:companyId}).select('id name bannerImage products').populate('products.productId') : await Companies.find({ products: { $exists: true, $ne: [] } }).select('id name bannerImage products').populate('products.productId')
 
         if(!CompaniesProducts){
             //could not get companies associated with products
@@ -48,7 +51,7 @@ module.exports.getProductsByCompanyId = async (req,res,next) =>{
     let id;
 
     //checks if user is company then it grabs the id from the jwt (private) else it grabs the id from the url params (public)
-    if(req.userType === 'Company'){
+    if(req.userType && req.userType === 'Company'){
         id = req.user._id;
     }else{
         id = req.params.companyId;
