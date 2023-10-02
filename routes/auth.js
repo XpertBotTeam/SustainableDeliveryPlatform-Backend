@@ -106,6 +106,9 @@ router.post(
   authController.Signup
 );
 
+//return if user is authenticated
+router.get('/getUserAuth',isAuth,authController.returnUserValidity)
+
 //handle sending verification email
 router.get('/verifyEmail',isAuth,authController.sendUserVerification)
 

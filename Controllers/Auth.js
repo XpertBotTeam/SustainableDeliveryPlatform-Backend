@@ -329,12 +329,22 @@ module.exports.placeOrder = async (req, res, next) => {
   }
 };
 
+//user validity
+module.exports.returnUserValidity = (req,res,next) => {
+  if(req.user && req.userType){
+    //authorized
+    return res.status(200).json({authorized:true,userType:req.userType,user:req.user})
+  }
+
+  //not authorized
+  return res.staus(401).json({authorized:false,userType:null});
+}
+
 //google auth
 module.exports.googleLogin =   passport.authenticate('google', {
   scope: ['profile', 'email'],
   failureRedirect: '/'
 });
-
 
 module.exports.googleCallback = (req, res, next) => {
   passport.authenticate('google', (err, user) => {

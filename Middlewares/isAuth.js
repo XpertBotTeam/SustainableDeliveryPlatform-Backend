@@ -23,7 +23,9 @@ module.exports = isAuth = async (req, res, next) => {
             req.user = user;
             req.userType = userJWT.userType
             userJWT.tokenType? req.tokenType = userJWT.tokenType : req.tokenType = 'authToken'
-            next();
+
+            //for checking user status
+           next();
         }
     } catch (err) {
         console.log(err);
