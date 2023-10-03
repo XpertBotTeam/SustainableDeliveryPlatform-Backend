@@ -15,6 +15,9 @@ router.post('/removeFromCart',isAuth,UserAdminController.removeFromCart)
 //get orders
 router.get('/myOrders',isAuth,UserAdminController.getOrders)
 
+//get orders
+router.get('/myCart',isAuth,UserAdminController.getCart)
+
 //track order
 router.post('/trackOrder/:orderId',isAuth,UserAdminController.trackOrder)
 

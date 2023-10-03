@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
     {
       companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Company",
 
         required: true,
       },

@@ -135,3 +135,39 @@ module.exports.trackOrder = async (req,res,next) => {
         return res.status(500).json({message:'error tracking order'});
     }
     }
+
+
+//get cart
+module.exports.getCart = async (req,res,next) => {
+    if(req.userType !== 'User'){
+       //not authorized
+       return res.status(401).json({message:'unauthorized user'});
+    }
+   
+    
+    try{
+       //getting cart
+       
+       //populate company details
+
+       const user = await req.user.populate({
+        path: 'cart.companyId',
+        select: 'profileImage name'
+    }).execPopulate();
+
+        const cart = await user.cart;
+   
+    if(cart.length === 0 || cart === null){
+           //no cart items found
+           return res.status(401).json({message:'cart is empty'});
+    }
+   
+    //return cart
+    return res.status(200).json({cart});
+   
+   }catch(err){
+       //error handling
+       console.log(err);
+       return res.status(500).json({message:'error getting cart'})
+   }
+   }
