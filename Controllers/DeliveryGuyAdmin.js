@@ -62,7 +62,8 @@ module.exports.getOrdersByDeliveryGuy = async (req,res,next) => {
         }
         console.log(JSON.stringify(query))
         //find order/orders
-        const orders = await Order.find(query);
+        const orders = await Order.find(query).populate({ path: 'userId',
+        select: 'address name _id'});
 
         if(!orders){
             //no orders found
@@ -176,4 +177,3 @@ module.exports.changeOrderStatus = async (req,res,next) => {
   return res.status(500).json({message:'error updating order status'})
 }
 }
-
