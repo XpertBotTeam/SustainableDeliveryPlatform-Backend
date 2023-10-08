@@ -25,11 +25,11 @@ module.exports.addNewProduct = async (req, res, next) => {
       .json({ message: "Unauthorized could not add product" });
   }
   try {
-    const { name, price, imagePath, tags, description } = req.body;
+    const { name, price, tags, description } = req.body;
     let newProduct = await new Product({
       name,
       price,
-      imagePath,
+      imagePath:`${req.file.filename? `localhost:3000/${req.file.filename}` : null}`,
       description: description ? description:null,
       tags: tags ? tags : null,
       ownerId: company._id,
@@ -129,3 +129,56 @@ catch(err) {
   return res.status(500).json({message:'error extracting orders'})
 }
 }
+
+
+//edit product
+module.exports.editProduct = async (req, res, next) => {
+  //validation
+  const result = validationResult(req);
+  if (!result.isEmpty()) {
+    console.log(result.array());
+    return res.status(500).json({ message: result.array() });
+  }
+
+  const { productId } = req.query;
+  const company = req.user;
+
+  if (req.userType != "Company") {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized could not edit product" });
+  }
+
+  try {
+    //finding product
+    let foundProduct = await Product.findOne({ ownerId: company._id, _id: productId });
+
+    if (!foundProduct) {
+      //editing product failed
+      return res.status(401).json({ message: "Product not found" });
+    }
+
+    //editing product
+    for (const key in req.body) {
+      if(req.body[key] !== null){
+        foundProduct[key] = req.body[key];
+      }
+    }
+
+    foundProduct['imagePath'] = `${req.file.filename? `localhost:3000/${req.file.filename}` : foundProduct['imagePath']}`
+
+    const result = await foundProduct.save(); // Use a different variable name
+
+    if (!result) {
+      //editing product failed
+      return res.status(401).json({ message: "Could not edit product" });
+    }
+
+    //succesful
+    return res.status(200).json({ message: "Product edited successfully" });
+  } catch (err) {
+    //handling errors
+    console.log(err);
+    return res.status(500).json({ message: "Error editing product" });
+  }
+};

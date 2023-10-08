@@ -6,6 +6,9 @@ const { v4: uuidv4 } = require("uuid");
 
 //mutler configure
 const storage = multer.diskStorage({
+  limits: {
+    fileSize: 50 * 1024 * 1024, 
+  },
   destination: (req, file, cb) => {
     cb(null, "images/");
   },
@@ -15,7 +18,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage }).single("image");
+const upload = multer({ storage }).single("imagePath");
 
 function ImageUpload(req, res, next) {
   upload(req, res, function (err) {
@@ -25,7 +28,7 @@ function ImageUpload(req, res, next) {
       return res.status(500).json({ message: "error uploading photo" });
     } else if (err) {
       //error handling
-      console.log(er);
+      console.log(err);
       return res.status(500).json({ message: "error uploading photo" });
     }
     next();

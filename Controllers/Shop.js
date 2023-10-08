@@ -14,7 +14,7 @@ const html = '<p>This is a <b>test</b> email.</p>';
 module.exports.getCompaniesProducts = async (req,res,next) => {
     try{
         //get companyId
-        const {companyId} = req.params;
+        const companyId = req.params.companyId || ( req.yser && req.user._id ?req.user._id :null);
 
         //getting companies and their products
         const CompaniesProducts = companyId? await Companies.find({_id:companyId}).select('id name bannerImage products').populate('products.productId') : await Companies.find({ products: { $exists: true, $ne: [] } }).select('id name bannerImage products').populate('products.productId')
@@ -63,7 +63,14 @@ module.exports.getProductsByCompanyId = async (req,res,next) =>{
     }
     try{
     //find products by company id
-    const products = await Products.find({ownerId:id});
+    const {productId} = req.query;
+
+    //bbuild the query
+    const params = {};
+    params.ownerId = id;
+    {productId ? params._id = productId : null}
+
+    const products = await Products.find(params);
     if(!products){
         //no products found
         return res.status(401).json({message:'Could not find products'});

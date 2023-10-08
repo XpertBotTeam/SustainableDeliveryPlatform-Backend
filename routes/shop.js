@@ -13,6 +13,9 @@ router.get('/getCompanyProducts/:companyId',shopController.getCompaniesProducts)
 //get companies associated with products
 router.get('/getCompanyProducts',shopController.getCompaniesProducts)
 
+//get company details associated with products
+router.get('/company/getCompanyProducts',isAuth,shopController.getCompaniesProducts)
+
 //get all products
 router.get('/getProducts',shopController.getProducts);
 
