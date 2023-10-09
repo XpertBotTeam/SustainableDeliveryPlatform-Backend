@@ -29,7 +29,7 @@ module.exports.addNewProduct = async (req, res, next) => {
     let newProduct = await new Product({
       name,
       price,
-      imagePath:`${req.file.filename? `localhost:3000/${req.file.filename}` : null}`,
+      imagePath:`${(req.file && req.file.filename)? `localhost:3000/${req.file.filename}` : null}`,
       description: description ? description:null,
       tags: tags ? tags : null,
       ownerId: company._id,
@@ -61,30 +61,28 @@ module.exports.addNewProduct = async (req, res, next) => {
 };
 
 //delete product
-module.exports.deleteProduct = async (req,res,next) => {
-    const company = req.user;
-    if (req.userType != "Company") {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized could not delete product" });
-    }
+module.exports.deleteProduct = async (req, res, next) => {
+  const company = req.user;
+  if (req.userType !== "Company") {
+      return res.status(401).json({ message: "Unauthorized could not delete product" });
+  }
 
-    //try finding and deleting
-    try{
-        const {productId} = req.params;
-        const result = await Product.findOneAndDelete({ownerId:company._id,_id:new mongoose.Types.ObjectId(productId)});
+  try {
+      const { productId } = req.params;
+      const product = await Product.findOne({ ownerId: company._id, _id: new mongoose.Types.ObjectId(productId) });
 
-        if (!result) {
-            //deleting failed
-            return res.status(401).json({ message: "Could not delete product" });
-        }
-        return res.status(200).json({ message: "Deleted succesfully" });
-    } catch (err) {
-        //handling errors
-        console.log(err);
-        return res.status(500).json({ message: "Error deleting product" });
+      const result = await Product.deleteOne(product);
+
+      if (!result) {
+          return res.status(401).json({ message: "Could not delete product" });
       }
+      return res.status(200).json({ message: "Deleted successfully" });
+  } catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: "Error deleting product" });
+  }
 }
+
 
 //get orders
 module.exports.getOrders = async (req,res,next) => {
@@ -165,7 +163,7 @@ module.exports.editProduct = async (req, res, next) => {
       }
     }
 
-    foundProduct['imagePath'] = `${req.file.filename? `localhost:3000/${req.file.filename}` : foundProduct['imagePath']}`
+    foundProduct['imagePath'] = `${ (req.file &&req.file.filename)? `localhost:3000/${req.file.filename}` : foundProduct['imagePath']}`
 
     const result = await foundProduct.save(); // Use a different variable name
 
@@ -182,3 +180,32 @@ module.exports.editProduct = async (req, res, next) => {
     return res.status(500).json({ message: "Error editing product" });
   }
 };
+
+//edit banner image
+module.exports.editBannerImage = async (req,res,next) => {
+  if(req.userType !== 'Company'){
+    //must be a company
+    return res.status(401).json({message:'unauthorized acces'})
+  }
+
+  if(!req.file || !req.file.filename){
+    //no file uploaded
+    return res.status(401).json({message:'please upload an image first'})
+  }
+
+  try{
+    req.user.bannerImage = `localhost:3000/${req.file.filename}`
+    const result = await req.user.save();
+
+    if(!result){
+      return res.status(401).json({message:'could not update bannerImage'})
+    }
+    //succesful
+    return res.status(200).json({message:'bannerimage updated succesfully'})
+
+  }catch(err){
+    //error handling
+    console.log(err);
+    return res.status(500).json({message:'error updating bannerImage'})
+  }
+}

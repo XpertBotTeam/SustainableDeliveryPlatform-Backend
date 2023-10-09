@@ -46,4 +46,7 @@ router.delete('/deleteProduct/:productId',isAuth,CompanyAdminController.deletePr
 //get orders
 router.get('/orders',isAuth,CompanyAdminController.getOrders);
 
+//update bbannerImage
+router.post('/updateBanner',isAuth,ImageUpload,CompanyAdminController.editBannerImage)
+
 module.exports = router;
