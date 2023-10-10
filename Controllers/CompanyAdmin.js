@@ -92,8 +92,15 @@ module.exports.getOrders = async (req,res,next) => {
   }
 
   try {
+    const {orderId} = req.query;
     // Getting orders that contain company Id
-    const orders = await Order.find({ 'companyOrders.companyId': req.user._id }).populate({path:'userId' , select:'name address _id'}).populate({path:'deliveryGuyId' , select:'name _id userName'});
+    const query = {'companyOrders.companyId': req.user._id }
+    
+    if(orderId){
+      query._id = orderId
+    }
+
+    const orders = await Order.find(query).populate({path:'userId' , select:'name address _id'}).populate({path:'deliveryGuyId' , select:'name _id userName'}).populate('companyOrders.items.product');
 
     if (!orders || !orders.length) {
       // No orders found
@@ -113,7 +120,8 @@ module.exports.getOrders = async (req,res,next) => {
         //map through company orders and return the company order in each order that has the companyId as user
         if(orderExtracted.companyId.toString() === req.user._id.toString()){
           order.user = companyOrder.userId
-          order.deliveryGuy = companyOrder.deliveryGuyId
+          order.deliveryGuy = companyOrder.deliveryGuyId;
+          order.total = companyOrder.total
           order.companyOrders.push(orderExtracted)
         }
       })
