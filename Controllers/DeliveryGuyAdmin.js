@@ -63,7 +63,10 @@ module.exports.getOrdersByDeliveryGuy = async (req,res,next) => {
         console.log(JSON.stringify(query))
         //find order/orders
         const orders = await Order.find(query).populate({ path: 'userId',
-        select: 'address name _id'});
+        select: 'address name _id'}) .populate({
+          path: 'companyOrders.companyId',
+          select: 'address'
+        });
 
         if(!orders){
             //no orders found

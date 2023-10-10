@@ -93,7 +93,7 @@ module.exports.getOrders = async (req,res,next) => {
 
   try {
     // Getting orders that contain company Id
-    const orders = await Order.find({ 'companyOrders.companyId': req.user._id });
+    const orders = await Order.find({ 'companyOrders.companyId': req.user._id }).populate({path:'userId' , select:'name address _id'}).populate({path:'deliveryGuyId' , select:'name _id userName'});
 
     if (!orders || !orders.length) {
       // No orders found
@@ -112,6 +112,8 @@ module.exports.getOrders = async (req,res,next) => {
       companyOrder.companyOrders.forEach(orderExtracted=>{
         //map through company orders and return the company order in each order that has the companyId as user
         if(orderExtracted.companyId.toString() === req.user._id.toString()){
+          order.user = companyOrder.userId
+          order.deliveryGuy = companyOrder.deliveryGuyId
           order.companyOrders.push(orderExtracted)
         }
       })
