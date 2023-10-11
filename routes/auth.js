@@ -135,7 +135,4 @@ router.get('/google',authController.googleLogin);
 router.get('/google/callback',authController.googleCallback);
 
 
-//place order
-router.get('/placeOrder',isAuth,authController.placeOrder);
-
 module.exports = router;

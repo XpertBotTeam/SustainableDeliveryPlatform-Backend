@@ -9,6 +9,9 @@ const isAuth = require('../Middlewares/isAuth');
 //add to cart route
 router.post('/addToCart',isAuth,UserAdminController.addToCart)
 
+//add to cart route
+router.get('/placeOrder',isAuth,UserAdminController.placeOrder)
+
 //remove from cart route
 router.post('/removeFromCart',isAuth,UserAdminController.removeFromCart)
 

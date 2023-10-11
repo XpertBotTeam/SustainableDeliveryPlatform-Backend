@@ -276,58 +276,7 @@ module.exports.changePass = async (req, res, next) => {
   }
 };
 
-//place order
-module.exports.placeOrder = async (req, res, next) => {
-  //the owner shall be a user and only a user
-  if (req.userType !== "User") {
-    return res.status(401).json({ message: "not authorized user" });
-  }
 
-  try {
-    //search user and add the cart with the related products
-    const user = await User.findById(req.user._id).populate(
-      "cart.items.product"
-    );
-
-    if (!user.cart.items.length) {
-      //cart is empty
-      return res
-        .status(401)
-        .json({ message: "cart is empty could not place order" });
-    }
-
-    // Calculate the total amount for the order and return products
-    let totalAmount = 0;
-    const productsForOrder = user.cart.items.map((cartItem) => {
-      const product = cartItem.productId;
-      const quantity = cartItem.quantity;
-      totalAmount += product.price * quantity;
-      return { product, quantity };
-    });
-
-    // Create a new order instance
-    const order = new Order({
-      userId: req.user._id,
-      items: productsForOrder,
-      total: totalAmount,
-    });
-
-    const result = await order.save();
-
-    if (!result) {
-      return res.status(401).json({ message: "could not place your order" });
-    }
-    //order saved succesfully
-    user.cart.items = [];
-    await user.save();
-
-    return res.status(200).json({ message: "order is placed succesfully" });
-  } catch (err) {
-    //error handling
-    console.log(err);
-    return res.status(500).json({ message: "error placing order" });
-  }
-};
 
 //user validity
 module.exports.returnUserValidity = (req,res,next) => {
