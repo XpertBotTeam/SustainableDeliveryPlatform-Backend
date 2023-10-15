@@ -14,7 +14,7 @@ const html = '<p>This is a <b>test</b> email.</p>';
 module.exports.getCompaniesProducts = async (req,res,next) => {
     try{
         //get companyId
-        const companyId = req.params.companyId || ( req.yser && req.user._id ?req.user._id :null);
+        const companyId = req.params.companyId || ( req.user && req.user._id ?req.user._id :null);
 
         //getting companies and their products
         const CompaniesProducts = companyId? await Companies.find({_id:companyId}).select('id name bannerImage products').populate('products.productId') : await Companies.find({ products: { $exists: true, $ne: [] } }).select('id name bannerImage products').populate('products.productId')

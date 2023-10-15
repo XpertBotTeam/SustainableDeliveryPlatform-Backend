@@ -29,7 +29,7 @@ module.exports.addNewProduct = async (req, res, next) => {
     let newProduct = await new Product({
       name,
       price,
-      imagePath:`${(req.file && req.file.filename)? `localhost:3000/${req.file.filename}` : null}`,
+      imagePath:`${(req.file && req.file.filename)? `http://localhost:3000/${req.file.filename}` : null}`,
       description: description ? description:null,
       tags: tags ? tags : null,
       ownerId: company._id,
@@ -72,6 +72,9 @@ module.exports.deleteProduct = async (req, res, next) => {
       const product = await Product.findOne({ ownerId: company._id, _id: new mongoose.Types.ObjectId(productId) });
 
       const result = await Product.deleteOne(product);
+      company.products = company.products.filter(product => product.productId.toString() !== productId);
+
+      await company.save()
 
       if (!result) {
           return res.status(401).json({ message: "Could not delete product" });
@@ -100,7 +103,7 @@ module.exports.getOrders = async (req,res,next) => {
       query._id = orderId
     }
 
-    const orders = await Order.find(query).populate({path:'userId' , select:'name address _id'}).populate({path:'deliveryGuyId' , select:'name _id userName'}).populate('companyOrders.items.product');
+    let orders = await Order.find(query).populate({path:'userId' , select:'name address _id'}).populate({path:'deliveryGuyId' , select:'name _id userName'}).populate('companyOrders.items.product').populate('orderDate');
 
     if (!orders || !orders.length) {
       // No orders found
@@ -114,6 +117,7 @@ module.exports.getOrders = async (req,res,next) => {
       const order = {}
 
       //extract order id 
+      order.orderDate = companyOrder.orderDate
       order.orderId  = companyOrder._id;
       order.companyOrders = []
       companyOrder.companyOrders.forEach(orderExtracted=>{
@@ -173,7 +177,7 @@ module.exports.editProduct = async (req, res, next) => {
       }
     }
 
-    foundProduct['imagePath'] = `${ (req.file &&req.file.filename)? `localhost:3000/${req.file.filename}` : foundProduct['imagePath']}`
+    foundProduct['imagePath'] = `${ (req.file &&req.file.filename)? `http://localhost:3000/${req.file.filename}` : foundProduct['imagePath']}`
 
     const result = await foundProduct.save(); // Use a different variable name
 
@@ -204,7 +208,7 @@ module.exports.editBannerImage = async (req,res,next) => {
   }
 
   try{
-    req.user.bannerImage = `localhost:3000/${req.file.filename}`
+    req.user.bannerImage = `http://localhost:3000/${req.file.filename}`
     const result = await req.user.save();
 
     if(!result){
@@ -219,3 +223,46 @@ module.exports.editBannerImage = async (req,res,next) => {
     return res.status(500).json({message:'error updating bannerImage'})
   }
 }
+
+module.exports.changeOrderStatus = async (req, res, next) => {
+  if (req.userType !== 'Company') {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  const { orderId } = req.body;
+
+  if (!orderId) {
+    return res.status(401).json({ message: 'Order not found' });
+  }
+
+  try {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      return res.status(401).json({ message: 'Order not found' });
+    }
+
+    for (const orderComp of order.companyOrders) {
+      if (orderComp.companyId.equals(req.user._id)) {
+        switch (orderComp.status) {
+          case 'Pending':
+            orderComp.status = 'Preparing';
+            break;
+          case 'Preparing':
+            orderComp.status = 'Prepared';
+            break;
+          default:
+            break;
+        }
+      }
+    }
+
+    await order.save();
+
+    return res.status(200).json({ message: 'Updated successfully' });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: 'Error updating order status' });
+  }
+};
+

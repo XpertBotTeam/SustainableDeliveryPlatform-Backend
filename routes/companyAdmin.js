@@ -26,6 +26,7 @@ router.post(
 );
 
 
+
 //edit product
 router.post(
   "/editProduct",
@@ -43,6 +44,7 @@ router.post(
 //delete product
 router.delete('/deleteProduct/:productId',isAuth,CompanyAdminController.deleteProduct)
 
+router.post('/changeStatus',isAuth,CompanyAdminController.changeOrderStatus);
 //get orders
 router.get('/orders',isAuth,CompanyAdminController.getOrders);
 

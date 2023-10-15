@@ -134,7 +134,7 @@ module.exports.getOrders = async (req, res, next) => {
   console.log(req.user._id);
   try {
     //getting orders
-    const orders = await Order.find({ userId: req.user._id }).populate({path:'deliveryGuyId',select:'_id name userName'}).populate('companyOrders.items.product').populate({path:'userId',select:'name address userName'});
+    const orders = await Order.find({ userId: req.user._id }).populate({path:'deliveryGuyId',select:'_id name userName'}).populate('companyOrders.items.product').populate({path:'userId',select:'name address userName'}).populate({path:'companyOrders.companyId',select:'_id name'});
 
     if (orders.length === 0 || orders === null) {
       //no orders found

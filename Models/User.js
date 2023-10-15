@@ -18,10 +18,7 @@ const UserSchema = new mongoose.Schema({
   profileImage: {
     type: String,
   },
-  address: {
-    longitude:String,
-    latitude:String
- },
+  
   verified: {
     type: Boolean,
     default: false,
@@ -48,7 +45,10 @@ const UserSchema = new mongoose.Schema({
         },
       ],
     },
-  ],
+  ],address:{
+    longitude:{type:Number},
+    latitude:{type:Number}
+  },
 });
 
 UserSchema.methods.addToCart = async function(productId, companyId) {

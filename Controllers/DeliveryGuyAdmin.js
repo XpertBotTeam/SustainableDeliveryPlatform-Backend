@@ -13,7 +13,7 @@ module.exports.getOrders = async (req,res,next) =>{
 
     try{
         //get products
-        const orders = await Order.find({deliveryGuyId:null})
+        const orders = await Order.find({deliveryGuyId:null}).populate({path:'userId',select:'_id name userName address'})
         if(!orders){
             return res.status(401).json({message:'No orders found for now'});
         }
@@ -24,6 +24,49 @@ module.exports.getOrders = async (req,res,next) =>{
         console.log(err);
         return res.status(500).json({message:'error searching for orders'})
     }
+}
+
+//get delivery routes for delivery guy
+module.exports.getRoutes = async (req,res,next) => {
+  if(req.userType !=='DeliveryGuy'){
+    //unauthorized access not a delivery guy 
+    return res.status(401).json({message:'unauthorized access'})
+  }
+
+  //extaract orderId
+  const {orderId} = req.params;
+
+  if(!orderId){
+    //no orderId passed
+    return res.status(401).json({message:'orderId is required'});
+  }
+
+  try{
+    //extract the order
+    const order = await Order.findOne({_id:orderId,deliveryGuyId:req.user._id}).populate({path:'userId',select: 'address _id'}).populate({path:'companyOrders.companyId',select:'address _id'});
+
+    
+    //extract destination address
+    const destination = order.userId.address;
+  
+    let otherAddresses = [];
+  
+    for(let orderCompany of order.companyOrders){
+        // extract related addresses
+        otherAddresses.push(orderCompany.companyId.address);
+    }
+    
+
+     return res.status(200).json({destination,otherAddresses})
+  }
+  catch(err){
+    //error handling
+    console.log(err);
+    return res.status(500).json({message:'error getting routes'})
+  }
+
+
+
 }
 
 //get orders by delivery guy

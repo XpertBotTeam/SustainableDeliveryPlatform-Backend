@@ -6,6 +6,7 @@ const orderSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  
       companyOrders: [
         {
         status: { type: String, default: "Pending" },

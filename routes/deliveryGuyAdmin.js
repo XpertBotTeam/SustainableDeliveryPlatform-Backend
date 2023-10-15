@@ -19,4 +19,7 @@ router.post('/AssignOrders/:orderId',isAuth,DeliveryController.assignOrder);
 //change order status
 router.post('/ChangeOrderStatus',isAuth,DeliveryController.changeOrderStatus);
 
+//change order status
+router.get('/getRoutes/:orderId',isAuth,DeliveryController.getRoutes);
+
 module.exports = router;

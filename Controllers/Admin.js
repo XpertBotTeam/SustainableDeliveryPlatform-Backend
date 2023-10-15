@@ -74,6 +74,32 @@ module.exports.deleteUser = async (req,res,next) => {
   
 }
 
+module.exports.handleLocationChnage = async (req,res,next) => {
+  if(!req.userType || req.userType === 'deliveryGuy'){
+      //unauthorized 
+      return res.status(401).json({message:'unauthorized'})
+  }
+
+  try{
+    console.log(req.userType)
+    console.log({'longitude': parseFloat(req.body.location.lng),'latitude':parseFloat(req.body.location.lat)})
+  //req.user.address = {'longitude':req.body.location.lng ,'latitude':req.body.location.lat}
+  console.log(JSON.stringify(req.user))
+  req.user.address.longitude = await req.body.location.lng;
+
+  req.user.address.latitude = await req.body.location.lat;
+
+
+  await req.user.save();
+  return res.status(200).json({message:'location updated succesfully'})
+}
+catch(err){
+  //error handling
+  console.log(err);
+  return res.status(500).json({message:'error updating location'})
+}
+}
+
 //upload profile picture
 module.exports.UpdateProfilePicture = async (req,res,next) => {
   //extracting uploaded image path

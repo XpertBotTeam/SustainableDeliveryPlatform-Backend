@@ -19,4 +19,6 @@ router.delete('/deleteUser',isAuth,AdminController.deleteUser)
 
 router.post('/editProfilePicture',isAuth,ImageUpload,AdminController.UpdateProfilePicture)
 
+router.post('/updateLocation',isAuth,AdminController.handleLocationChnage)
+
 module.exports = router;
