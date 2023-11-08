@@ -8,11 +8,11 @@ const jwt = require("jsonwebtoken");
 const User = require("../Models/User");
 const Company = require("../Models/Company");
 const DeliveryGuy = require("../Models/DeliveryGuy");
-const Order = require('../Models/Order');
 
 //google auth
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
 const passport = require('passport');
+
 
 //google auth
 passport.use(new GoogleStrategy({

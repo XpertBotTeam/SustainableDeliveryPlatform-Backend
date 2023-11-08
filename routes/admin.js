@@ -12,7 +12,7 @@ const ImageUpload = require('../Utils/ImageUpload');
 //router.post('/addProduct',isAuth,CompanyAdminController.addProduct)
 
 //handle edit user route
-router.post('/editUser',isAuth,AdminController.editUserProfile)
+router.post('/editUser',isAuth,ImageUpload,AdminController.editUserProfile)
 
 //handle delete user route
 router.delete('/deleteUser',isAuth,AdminController.deleteUser)

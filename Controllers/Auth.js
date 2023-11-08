@@ -10,6 +10,8 @@ const DeliveryGuy = require("../Models/DeliveryGuy");
 const Order = require('../Models/Order');
 
 
+//midlewares
+const mailer = require('../Utils/Mailer');
 
 //validation results from validator
 const { validationResult } = require("express-validator");
@@ -49,7 +51,33 @@ module.exports.Login = async (req, res, next) => {
       let token = jwt.sign({ user, userType }, "SuperSecret", {
         expiresIn: "1h",
       });
-      return res.status(200).json({ jwt: token });
+
+      //set response
+      let response = {};
+      response.jwt = token
+
+      if(user.verified === true){
+        response.verified = true;
+      }else{
+        //send verification email
+        const mailToken = jwt.sign(
+          { user: req.user, userType: req.userType, tokenType: "verificationToken" },
+          "SuperSecret",
+          {
+            expiresIn: "5m",
+          }
+        );
+        const message = `
+          <h1><b>Please click the link to verify</b></h1>
+          <a href='http://localhost:3000/auth/verifyUser?jwt=${mailToken}'>Verify User</a>`
+
+          await mailer.sendMail(user.userName,'Email Verification','Email Verification' , message)
+
+          response.verified = false;
+      }
+      response.verified = user.verified
+
+      return res.status(200).json(response);
     } else {
       //username and password doesn't match
       console.log("authentication failed no user found");
@@ -79,7 +107,7 @@ module.exports.Signup = async (req, res, next) => {
       (await Company.findOne({ userName })) ||
       (await DeliveryGuy.findOne({ userName }));
     if (user) {
-      return res.status(401).json({ message: "user already found" });
+      return res.status(401).json({ message: [{msg:"user already found"}]});
     }
 
     if (type === "User") {
@@ -282,7 +310,7 @@ module.exports.changePass = async (req, res, next) => {
 module.exports.returnUserValidity = (req,res,next) => {
   if(req.user && req.userType){
     //authorized
-    return res.status(200).json({authorized:true,userType:req.userType,user:req.user})
+    return res.status(200).json({authorized:true,userType:req.userType,user:req.user,verified:req.user.verified,profileImage:req.user.profileImage})
   }
 
   //not authorized

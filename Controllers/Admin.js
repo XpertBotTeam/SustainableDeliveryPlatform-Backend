@@ -7,8 +7,8 @@ const  SearchByUserType = require('../Utils/SearchByUserType');
 
 //update User Profile
 module.exports.editUserProfile = async (req, res, next) => {
-  const { name, profileImage, phoneNumber, longitude, latitude } = req.body;
-  console.log(req.userType);
+  console.log('done')
+  const { name, phoneNumber} = req.body;
 
   try {
     //find user to update
@@ -19,12 +19,11 @@ module.exports.editUserProfile = async (req, res, next) => {
     }
 
     //replace the data
-    name ? (user.name = name) : "";
-    profileImage ? (user.profileImage = profileImage) : "";
-    phoneNumber ? (user.phoneNumber = phoneNumber) : "";
-    longitude ? (user.address.longitude = longitude) : "";
-    latitude ? (user.address.latitude = latitude) : "";
-    country ? (user.address.country = country) : "";
+    (name!=='null' || name!==null) ? (user.name = name) : "";
+    phoneNumber!==null ? (user.phoneNumber = phoneNumber) : "";
+    if(req.file&&req.file.filename){
+      user.profileImage = `http://localhost:3000/${req.file.filename}`;
+    }
 
     //save data
     const result = await user.save();
@@ -107,7 +106,9 @@ module.exports.UpdateProfilePicture = async (req,res,next) => {
 
   try{
     //changing profile pic
-    user.profileImage = imagePath;
+    if(imagePath){
+      req.user.profileImage = imagePath
+    }
     const result = await user.save();
 
     if(!result){

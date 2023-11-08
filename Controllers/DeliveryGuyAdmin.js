@@ -191,20 +191,20 @@ module.exports.changeOrderStatus = async (req,res,next) => {
     return res.status(401).json({message:'order not found'});
   }
 
-  //extract order status to be updated
-  const {status} = req.query;
-  if(!status){
-    //no order status
-    return res.status(401).json({message:'please set the order status'});
-  }
-  
+ 
   //must be a delivery guy to change the status
   if(req.user._id.toString() !== order.deliveryGuyId.toString()){
     return res.status(401).json({message:'not authorized'})
   }
 
-  if((order.status === 'Prepared' && status === 'Delivering') || (order.status === 'Delivering' && status === 'Delivered')){
-    order.status = status;
+  if(order.status === 'Prepared'){
+    order.status = 'Delivering';
+  }else if(order.status === 'Delivering'){
+    order.status = 'Delivered';
+  }else{
+    return res.status(400).json({message:'error updating status (not authorized)'})
+  }
+  
     const result = await order.save();
 
     if(!result){
@@ -213,10 +213,6 @@ module.exports.changeOrderStatus = async (req,res,next) => {
     }
 
     return res.status(200).json({message:'order status updated succesfully'})
-  }else{
-     //status was not updated succesfully
-     return res.status(401).json({message:'order status was not updated'})
-  }
 } catch(err){
   //error handling
   console.log(err);

@@ -242,7 +242,11 @@ module.exports.changeOrderStatus = async (req, res, next) => {
       return res.status(401).json({ message: 'Order not found' });
     }
 
+    //to check if all sub orders are complete
+    let isComplete = true
     for (const orderComp of order.companyOrders) {
+
+      //changing status
       if (orderComp.companyId.equals(req.user._id)) {
         switch (orderComp.status) {
           case 'Pending':
@@ -255,6 +259,16 @@ module.exports.changeOrderStatus = async (req, res, next) => {
             break;
         }
       }
+
+      //checking status for updating the complete order status
+      if(orderComp.status !== 'Prepared'){
+        isComplete=false;
+      }
+    }
+
+    //set order status to complete
+    if(isComplete){
+      order.status = 'Prepared'
     }
 
     await order.save();

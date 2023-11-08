@@ -70,7 +70,7 @@ module.exports.placeOrder = async (req, res, next) => {
     });
 
    let total = 0;
-
+console.log(user.cart);
 for (const order of user.cart) {
   for (const item of order.items) {
     total += item.product.price * item.quantity;
